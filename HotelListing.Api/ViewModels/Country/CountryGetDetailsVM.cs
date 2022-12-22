@@ -2,11 +2,9 @@
 
 namespace HotelListing.Api.ViewModels.Country
 {
-    public class CountryGetDetailsVM
+    public class CountryGetDetailsVM :CountryBaseVM
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string ShortName { get; set; }
 
         public List<HotelVM> Hotels { get; set; } 
     }
