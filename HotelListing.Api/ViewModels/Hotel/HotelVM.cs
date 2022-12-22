@@ -1,14 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace HotelListing.Api.ViewModels.Hotel
+﻿namespace HotelListing.Api.ViewModels.Hotel
 {
-    public class HotelVM
+    public class HotelVM : HotelBaseVM
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Adress { get; set; }
-        public double Rating { get; set; }
-        public int CountryId { get; set; }
-
     }
 }

@@ -25,8 +25,7 @@ namespace HotelListing.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryGetVM>>> GetCountries()
         {
-            var countries = await _repo.GetAllAsync();
-            return Ok(_mapper.Map<List<CountryGetVM>>(countries));
+            return Ok(_mapper.Map<List<CountryGetVM>>(await _repo.GetAllAsync()));
         }
 
         // GET: api/Countries/5
@@ -41,11 +40,16 @@ namespace HotelListing.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCountry(int id, CountryUpdateVM countryUpdateVM)
         {
+            if (countryUpdateVM.Id != id) 
+            {
+                return BadRequest();
+            }
+
             var country = await _repo.GetAsync(id);
 
             if (country == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             _mapper.Map(countryUpdateVM, country);
@@ -63,7 +67,7 @@ namespace HotelListing.Api.Controllers
 
         // POST: api/Countries
         [HttpPost]
-        public async Task<ActionResult<Country>> PostCountry(CountryVM countryVM)
+        public async Task<ActionResult<Country>> PostCountry(CountryBaseVM countryVM)
         {
             var country = _mapper.Map<Country>(countryVM);
             await _repo.AddAsync(country);

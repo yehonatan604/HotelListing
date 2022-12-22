@@ -1,7 +1,5 @@
-﻿using AutoMapper.Internal;
-using HotelListing.Api.Contracts;
+﻿using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Api.Repository

@@ -10,12 +10,13 @@ namespace HotelListing.Api.Configurations
     {
         public AutoMapperConfig() 
         {
-            CreateMap<Country, CountryVM>().ReverseMap();
+            CreateMap<Country, CountryBaseVM>().ReverseMap();
             CreateMap<Country, CountryGetVM>().ReverseMap();
             CreateMap<Country, CountryGetDetailsVM>().ReverseMap();
             CreateMap<Country, CountryUpdateVM>().ReverseMap();
 
             CreateMap<Hotel, HotelVM>().ReverseMap();
+            CreateMap<Hotel, HotelCreateVM>().ReverseMap();
         }
     }
 }

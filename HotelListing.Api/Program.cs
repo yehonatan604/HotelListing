@@ -41,6 +41,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 // Repository Pattern
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 
 #endregion Add_Services_to_the_Container
 
