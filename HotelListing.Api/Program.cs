@@ -7,7 +7,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+#region Add_Services_to_the_Container
 
 var connectionString = builder.Configuration.GetConnectionString("HotelListingDbCnnectionString");
 builder.Services.AddDbContextFactory<HotelDbContext>(options =>
@@ -16,10 +16,13 @@ builder.Services.AddDbContextFactory<HotelDbContext>(options =>
 });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Swager
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+// Cors
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin()
@@ -27,18 +30,24 @@ builder.Services.AddCors(options =>
                                                   .AllowAnyMethod());
 });
 
+
+// Serilog
 builder.Host.UseSerilog((ctx, loggerConfiguration) => loggerConfiguration
                                                           .WriteTo.Console()
                                                           .ReadFrom.Configuration(ctx.Configuration));
-
+// AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 
+// Repository Pattern
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 
+#endregion Add_Services_to_the_Container
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+#region Configure_HTTP_Request_Pipeline
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -52,5 +61,7 @@ app.UseCors("AllowAll");
 app.UseAuthorization();
 
 app.MapControllers();
+
+#endregion Configure_HTTP_Request_Pipeline
 
 app.Run();
