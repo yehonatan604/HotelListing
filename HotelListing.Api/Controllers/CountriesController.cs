@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HotelListing.Api.Data;
+using HotelListing.Api.ViewModels;
+using AutoMapper;
+using HotelListing.Api.ViewModels.Country;
 
 namespace HotelListing.Api.Controllers
 {
@@ -13,27 +11,32 @@ namespace HotelListing.Api.Controllers
     [ApiController]
     public class CountriesController : ControllerBase
     {
-        private readonly HotelDbContext db;
+        private readonly HotelDbContext _db;
+        private readonly IMapper _mapper;
 
-        public CountriesController(IDbContextFactory<HotelDbContext> dbFactory)
+        public CountriesController(IDbContextFactory<HotelDbContext> dbFactory, IMapper mapper)
         {
-            db = dbFactory.CreateDbContext();
+            _db = dbFactory.CreateDbContext();
+            _mapper = mapper;
         }
 
         // GET: api/Countries
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
+        public async Task<ActionResult<IEnumerable<CountryGetVM>>> GetCountries()
         {
-            var countries = await db.Countries.ToListAsync();
-            return Ok(countries);
+            var countries = await _db.Countries.ToListAsync();
+            var records = _mapper.Map<List<CountryGetVM>>(countries);
+            return Ok(records);
         }
 
         // GET: api/Countries/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Country>> GetCountry(int id)
+        public async Task<ActionResult<CountryGetDetailsVM>> GetCountry(int id)
         {
-            var country = await db.Countries.FindAsync(id);
-            return country == null ? NotFound() : Ok(country);
+            var country = await _db.Countries.Include(c => c.Hotels)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            var record = _mapper.Map<CountryGetDetailsVM>(country);
+            return country == null ? NotFound() : Ok(record);
         }
 
         // PUT: api/Countries/5
@@ -46,11 +49,11 @@ namespace HotelListing.Api.Controllers
                 return BadRequest();
             }
 
-            db.Entry(country).State = EntityState.Modified;
+            _db.Entry(country).State = EntityState.Modified;
 
             try
             {
-                await db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -70,10 +73,11 @@ namespace HotelListing.Api.Controllers
         // POST: api/Countries
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Country>> PostCountry(Country country)
+        public async Task<ActionResult<Country>> PostCountry(CountryVM countryVM)
         {
-            db.Countries.Add(country);
-            await db.SaveChangesAsync();
+            var country = _mapper.Map<Country>(countryVM);
+            _db.Countries.Add(country);
+            await _db.SaveChangesAsync();
 
             return CreatedAtAction("GetCountry", new { id = country.Id }, country);
         }
@@ -82,21 +86,21 @@ namespace HotelListing.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCountry(int id)
         {
-            var country = await db.Countries.FindAsync(id);
+            var country = await _db.Countries.FindAsync(id);
             if (country == null)
             {
                 return NotFound();
             }
 
-            db.Countries.Remove(country);
-            await db.SaveChangesAsync();
+            _db.Countries.Remove(country);
+            await _db.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool CountryExists(int id)
         {
-            return db.Countries.Any(e => e.Id == id);
+            return _db.Countries.Any(e => e.Id == id);
         }
     }
 }
