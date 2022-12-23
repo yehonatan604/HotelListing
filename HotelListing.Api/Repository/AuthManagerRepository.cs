@@ -22,7 +22,10 @@ namespace HotelListing.Api.Repository
             user.UserName = userVM.Email;
             var result = await _userManager.CreateAsync(user, userVM.Password);
 
-            if(result.Succeeded) {  await _userManager.UpdateAsync(user); }
+            if(result.Succeeded) 
+            {  
+                await _userManager.UpdateAsync(user); 
+            }
 
             return result.Errors;
         }
