@@ -10,12 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region Add_Services_to_the_Container
 
+// DbContextFactory
 var connectionString = builder.Configuration.GetConnectionString("HotelListingDbCnnectionString");
 builder.Services.AddDbContextFactory<HotelDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
 
+// Identity Core
 builder.Services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<HotelDbContext>();
@@ -53,18 +55,23 @@ var app = builder.Build();
 
 #region Configure_HTTP_Request_Pipeline
 
+// Swager
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Https
 app.UseHttpsRedirection();
 
+// Cors
 app.UseCors("AllowAll");
 
+// Authorization
 app.UseAuthorization();
 
+// Controllers
 app.MapControllers();
 
 #endregion Configure_HTTP_Request_Pipeline

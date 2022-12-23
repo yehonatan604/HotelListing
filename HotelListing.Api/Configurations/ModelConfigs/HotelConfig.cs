@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace HotelListing.Api.Configurations.UserIdentityConfig
+namespace HotelListing.Api.Configurations.ModelConfigs
 {
     public class HotelConfig : IEntityTypeConfiguration<Hotel>
     {

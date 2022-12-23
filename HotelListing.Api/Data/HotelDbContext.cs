@@ -1,4 +1,4 @@
-﻿using HotelListing.Api.Configurations.UserIdentityConfig;
+﻿using HotelListing.Api.Configurations.ModelConfigs;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
