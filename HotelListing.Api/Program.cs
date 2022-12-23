@@ -2,6 +2,7 @@ using HotelListing.Api.Configurations;
 using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
 using HotelListing.Api.Repository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -14,6 +15,10 @@ builder.Services.AddDbContextFactory<HotelDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
+
+builder.Services.AddIdentityCore<User>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<HotelDbContext>();
 
 builder.Services.AddControllers();
 
@@ -29,7 +34,6 @@ builder.Services.AddCors(options =>
                                                   .AllowAnyHeader()
                                                   .AllowAnyMethod());
 });
-
 
 // Serilog
 builder.Host.UseSerilog((ctx, loggerConfiguration) => loggerConfiguration
