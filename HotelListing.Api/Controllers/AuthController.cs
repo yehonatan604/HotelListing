@@ -45,13 +45,20 @@ namespace HotelListing.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> Login([FromBody]UserLoginVM loginVM)
         {
-            var isValidUser = await _manager.Login(loginVM);
+            var authResponse = await _manager.Login(loginVM);
+            return authResponse == null ? Unauthorized() : Ok(authResponse);
+        }
 
-            if (!isValidUser)
-            {
-                return Unauthorized(); // error 401
-            }
-            return Ok();
+        // POST: api/Auth/refreshtoken
+        [HttpPost]
+        [Route("refreshtoken")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> RefreshToken([FromBody] AuthResponseDTO request)
+        {
+            var authResponse = await _manager.VerifyRefreshToken(request);
+            return authResponse == null ? Unauthorized() : Ok(authResponse);
         }
     }
 }

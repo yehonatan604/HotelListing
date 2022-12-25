@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HotelListing.Api.Data;
-using HotelListing.Api.ViewModels;
 using AutoMapper;
 using HotelListing.Api.ViewModels.Country;
 using HotelListing.Api.Contracts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HotelListing.Api.Controllers
 {
@@ -40,7 +40,7 @@ namespace HotelListing.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCountry(int id, CountryUpdateVM countryUpdateVM)
         {
-            if (countryUpdateVM.Id != id) 
+            if (countryUpdateVM.Id != id)
             {
                 return BadRequest();
             }
@@ -67,7 +67,7 @@ namespace HotelListing.Api.Controllers
 
         // POST: api/Countries
         [HttpPost]
-        public async Task<ActionResult<Country>> PostCountry(CountryBaseVM countryVM)
+        public async Task<ActionResult<Country>> PostCountry(CountryCreateVM countryVM)
         {
             var country = _mapper.Map<Country>(countryVM);
             await _repo.AddAsync(country);
@@ -76,6 +76,7 @@ namespace HotelListing.Api.Controllers
 
         // DELETE: api/Countries/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCountry(int id)
         {
             if (await _repo.GetAsync(id) == null)

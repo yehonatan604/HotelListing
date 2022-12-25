@@ -6,6 +6,8 @@ namespace HotelListing.Api.Contracts
     public interface IAuthManager
     {
         Task<IEnumerable<IdentityError>> Register(UserVM userVM);
-        Task<bool> Login(UserLoginVM loginVM);
+        Task<AuthResponseDTO?> Login(UserLoginVM loginVM);
+        Task<string> CreateRefreshToken();
+        Task<AuthResponseDTO?> VerifyRefreshToken(AuthResponseDTO request);
     }
 }

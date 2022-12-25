@@ -6,6 +6,6 @@ namespace HotelListing.Api.ViewModels.Country
     {
         public int Id { get; set; }
 
-        public List<HotelBaseVM> Hotels { get; set; } 
+        public List<HotelVM> Hotels { get; set; } 
     }
 }
