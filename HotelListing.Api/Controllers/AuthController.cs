@@ -1,6 +1,6 @@
 ﻿using HotelListing.Api.Contracts;
+using HotelListing.Api.Exceptions;
 using HotelListing.Api.ViewModels.User;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.Api.Controllers
@@ -10,9 +10,12 @@ namespace HotelListing.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthManager _manager;
-        public AuthController(IAuthManager manager)
+        private readonly ILogger<AuthController> _logger;
+
+        public AuthController(IAuthManager manager, ILogger<AuthController> logger)
         {
             _manager = manager;
+            _logger = logger;
         }
 
 
@@ -22,31 +25,36 @@ namespace HotelListing.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Register([FromBody]UserVM userVM)
+        public async Task<ActionResult> Register([FromBody] UserVM userVM)
         {
-            var errors = await _manager.Register(userVM);
+            _logger.LogInformation($"Registration attempt for {userVM.Email}");
 
+            var errors = await _manager.Register(userVM);
+            
             if (errors.Any())
             {
                 foreach (var error in errors)
                 {
                     ModelState.AddModelError(error.Code, error.Description);
                 }
-                return BadRequest(ModelState);
+                throw new BadRequestException(nameof(Register), ModelState);
             }
-            return Ok(userVM); //it will send all the details including password back to ttte client!!!!
+            return Ok();
         }
-        
+
         // POST: api/Auth/login
         [HttpPost]
         [Route("login")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Login([FromBody]UserLoginVM loginVM)
+        public async Task<ActionResult> Login([FromBody] UserLoginVM loginVM)
         {
+            _logger.LogInformation($"Login attempt for {loginVM.Email}");
             var authResponse = await _manager.Login(loginVM);
-            return authResponse == null ? Unauthorized() : Ok(authResponse);
+            return authResponse == null ?
+                   throw new UnauthorizedException(nameof(Login), loginVM.Email) : 
+                   Ok(authResponse);
         }
 
         // POST: api/Auth/refreshtoken
@@ -58,7 +66,9 @@ namespace HotelListing.Api.Controllers
         public async Task<ActionResult> RefreshToken([FromBody] AuthResponseDTO request)
         {
             var authResponse = await _manager.VerifyRefreshToken(request);
-            return authResponse == null ? Unauthorized() : Ok(authResponse);
+            return authResponse == null ?
+                   throw new UnauthorizedException(nameof(RefreshToken), request.UserId!) :
+                   Ok(authResponse);
         }
     }
 }

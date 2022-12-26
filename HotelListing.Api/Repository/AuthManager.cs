@@ -15,6 +15,7 @@ namespace HotelListing.Api.Repository
     public class AuthManager : IAuthManager
     {
         private readonly IMapper _mapper;
+        private readonly ILogger<AuthManager> _logger;
         private readonly UserManager<User> _manager;
         private readonly IConfiguration _config;
         private User _user;
@@ -25,9 +26,11 @@ namespace HotelListing.Api.Repository
         public AuthManager(
             IMapper mapper,
             UserManager<User> userManager,
-            IConfiguration config)
+            IConfiguration config,
+            ILogger<AuthManager> logger)
         {
             _mapper = mapper;
+            _logger = logger;
             _manager = userManager;
             _config = config;
         }
@@ -45,16 +48,19 @@ namespace HotelListing.Api.Repository
 
         public async Task<AuthResponseDTO?> Login(UserLoginVM loginVM)
         {
-
+            _logger.LogInformation($"Looking for user '{loginVM.Email}'");
             _user = await _manager.FindByEmailAsync(loginVM.Email);
             bool isValid = await _manager.CheckPasswordAsync(_user, loginVM.Password);
 
             if (_user == null || !isValid)
             {
+                _logger.LogWarning($"user with email '{loginVM.Email}' was not found!!!");
                 return null;
             }
 
             var token = await GenerateToken();
+            _logger.LogInformation($"Generated token: {token}\nfor user: {loginVM.Email}");
+
             return new AuthResponseDTO
             {
                 Token = token,
@@ -82,12 +88,12 @@ namespace HotelListing.Api.Repository
             var jsonSecurityTokeHandler = new JwtSecurityTokenHandler();
             var tokenContent = jsonSecurityTokeHandler.ReadJwtToken(request.Token);
             var userName = tokenContent.Claims.ToList()
-                .FirstOrDefault(e => e.Type == JwtRegisteredClaimNames.Email)?
-                .Value;
+                .FirstOrDefault(e => e.Type == JwtRegisteredClaimNames.Email)?.Value;
+
             _user = await _manager.FindByNameAsync(userName);
-            
-            if (_user == null || _user.Id != request.UserId) 
-            { 
+
+            if (_user == null || _user.Id != request.UserId)
+            {
                 return null;
             }
 

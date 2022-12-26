@@ -1,19 +1,18 @@
 using HotelListing.Api.Configurations;
 using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
+using HotelListing.Api.Middleware;
 using HotelListing.Api.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NuGet.Protocol;
 using Serilog;
-using System.Diagnostics;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#region Add_Services_to_the_Container
+#region Services
 
 // DbContextFactory
 var connectionString = builder.Configuration.GetConnectionString("HotelListingDbCnnectionString");
@@ -81,11 +80,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-#endregion Add_Services_to_the_Container
+#endregion Services
 
 var app = builder.Build();
 
-#region Configure_HTTP_Request_Pipeline
+#region Middleware
 
 // Swager
 if (app.Environment.IsDevelopment())
@@ -93,6 +92,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Exception Middleware
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Https
 app.UseHttpsRedirection();
@@ -109,6 +111,6 @@ app.UseAuthorization();
 // Controllers
 app.MapControllers();
 
-#endregion Configure_HTTP_Request_Pipeline
+#endregion Middleware
 
 app.Run();
