@@ -4,7 +4,8 @@ using HotelListing.Api.Data;
 using HotelListing.Api.ViewModels.Auth;
 using HotelListing.Api.ViewModels.User;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,11 +25,11 @@ namespace HotelListing.Api.Repository
         private const string _loginProvider = "HotelListingApi";
         private const string _refreshToken = "RefreshToken";
 
-        public AuthManager(
-            IMapper mapper,
-            UserManager<User> userManager,
-            IConfiguration config,
-            ILogger<AuthManager> logger)
+        public AuthManager
+            (IMapper mapper,
+             UserManager<User> userManager,
+             IConfiguration config,
+             ILogger<AuthManager> logger)
         {
             _mapper = mapper;
             _logger = logger;

@@ -1,6 +1,8 @@
 ﻿using HotelListing.Api.Configurations.ModelConfigs;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace HotelListing.Api.Data
 {
