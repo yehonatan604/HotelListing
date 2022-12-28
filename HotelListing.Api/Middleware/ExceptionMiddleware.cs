@@ -1,4 +1,5 @@
 ﻿using HotelListing.Api.Exceptions;
+using HotelListing.Api.ViewModels.Auth;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using System.Net;
@@ -41,20 +42,8 @@ namespace HotelListing.Api.Middleware
                 _ => HttpStatusCode.InternalServerError
             });
 
-            ErrorDetails errorDetails = new(ex.Message, ex.GetType().Name);
+            ErrorDetailsDTO errorDetails = new(ex.Message, ex.GetType().Name);
             return context.Response.WriteAsync(JsonConvert.SerializeObject(errorDetails));
-        }
-    }
-
-    public class ErrorDetails
-    {
-        public string ErrorMessage { get; set; }
-        public string ErrorType { get; set; }
-
-        public ErrorDetails(string errorMessage, string errorType)
-        {
-            ErrorMessage = errorMessage;
-            ErrorType = errorType;
         }
     }
 }

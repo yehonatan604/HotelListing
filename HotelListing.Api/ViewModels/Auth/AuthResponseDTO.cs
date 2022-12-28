@@ -1,4 +1,4 @@
-﻿namespace HotelListing.Api.ViewModels.User
+﻿namespace HotelListing.Api.ViewModels.Auth
 {
     public class AuthResponseDTO
     {

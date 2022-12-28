@@ -6,11 +6,14 @@ using HotelListing.Api.ViewModels.Country;
 using HotelListing.Api.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using HotelListing.Api.Exceptions;
+using HotelListing.Api.ViewModels.Page;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace HotelListing.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("v{version:apiVersion}/api/[controller]")]
+    [ApiVersion("1.0")]
     public class CountriesController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -27,11 +30,20 @@ namespace HotelListing.Api.Controllers
             _logger = logger;
         }
 
-        // GET: api/Countries
-        [HttpGet]
+        // GET: api/Countries/GetAll
+        [HttpGet("GetAll")]
+        [EnableQuery]
         public async Task<ActionResult<IEnumerable<CountryGetVM>>> GetCountries()
         {
             return Ok(_mapper.Map<List<CountryGetVM>>(await _repo.GetAllAsync()));
+        }
+        
+        // GET: api/Countries?StartIndex=0&PageSize=5&PageNumber=1
+        [HttpGet]
+        public async Task<ActionResult<PageResult<CountryGetVM>>> GetPagedCountries
+            ([FromQuery] QueryParameters queryParameters)
+        {
+            return Ok(await _repo.GetAllAsync<CountryGetVM>(queryParameters));
         }
 
         // GET: api/Countries/5

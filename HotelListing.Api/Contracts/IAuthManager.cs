@@ -1,4 +1,5 @@
-﻿using HotelListing.Api.ViewModels.User;
+﻿using HotelListing.Api.ViewModels.Auth;
+using HotelListing.Api.ViewModels.User;
 using Microsoft.AspNetCore.Identity;
 
 namespace HotelListing.Api.Contracts

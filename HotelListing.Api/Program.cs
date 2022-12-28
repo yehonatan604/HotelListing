@@ -5,8 +5,10 @@ using HotelListing.Api.Middleware;
 using HotelListing.Api.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.OData;
 using Serilog;
 using System.Text;
 
@@ -28,12 +30,31 @@ builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<HotelDbContext>()
     .AddDefaultTokenProviders();
 
+// Controllers
 builder.Services.AddControllers();
 
 // Swager
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader("api-version"),
+        new HeaderApiVersionReader("X-Version"),
+        new MediaTypeApiVersionReader("ver")
+    );
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
 
 // Cors
 builder.Services.AddCors(options =>
@@ -70,7 +91,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidateLifetime= true,
+        ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
@@ -78,6 +99,18 @@ builder.Services.AddAuthentication(options =>
             (Encoding.UTF8.GetBytes(builder.Configuration["Keys:Key"]))
 
     };
+});
+
+// Caching
+builder.Services.AddResponseCaching(options =>
+{
+    options.MaximumBodySize = 1024;
+    options.UseCaseSensitivePaths = true;
+});
+
+builder.Services.AddControllers().AddOData(options =>
+{
+    options.Select().Filter().OrderBy();
 });
 
 #endregion Services
@@ -101,6 +134,24 @@ app.UseHttpsRedirection();
 
 // Cors
 app.UseCors("AllowAll");
+
+// Caching
+app.UseResponseCaching();
+
+app.Use(async (context, next) =>
+{
+    context.Response.GetTypedHeaders().CacheControl =
+        new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+        {
+            Public = true,
+            MaxAge = TimeSpan.FromSeconds(10),
+        };
+
+    context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
+        new string[] { "Accept-Encoding" };
+
+    await next();
+});
 
 // Authenetication
 app.UseAuthentication();

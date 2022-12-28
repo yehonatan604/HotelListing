@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
+using HotelListing.Api.ViewModels.Auth;
 using HotelListing.Api.ViewModels.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.JsonWebTokens;

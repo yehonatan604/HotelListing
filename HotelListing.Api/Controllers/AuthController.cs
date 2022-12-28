@@ -1,12 +1,14 @@
 ﻿using HotelListing.Api.Contracts;
 using HotelListing.Api.Exceptions;
+using HotelListing.Api.ViewModels.Auth;
 using HotelListing.Api.ViewModels.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("v{version:apiVersion}/api/[controller]")]
+    [ApiVersion("1.0")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthManager _manager;
