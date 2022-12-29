@@ -32,6 +32,7 @@ namespace HotelListing.Api.Controllers
 
         // GET: api/Countries/GetAll
         [HttpGet("GetAll")]
+        [Authorize]
         [EnableQuery]
         public async Task<ActionResult<IEnumerable<CountryGetVM>>> GetCountries()
         {
