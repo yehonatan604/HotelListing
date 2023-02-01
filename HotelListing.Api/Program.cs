@@ -40,8 +40,8 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Hotel Listing Api", 
-        Version= "v1"
+        Title = "Hotel Listing Api",
+        Version = "v1"
     });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -155,11 +155,9 @@ var app = builder.Build();
 #region Middleware
 
 // Swager
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Exception Middleware
 app.UseMiddleware<ExceptionMiddleware>();

@@ -41,6 +41,7 @@ namespace HotelListing.Api.Controllers
         
         // GET: api/Countries?StartIndex=0&PageSize=5&PageNumber=1
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<PageResult<CountryGetVM>>> GetPagedCountries
             ([FromQuery] QueryParameters queryParameters)
         {
